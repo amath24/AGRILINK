@@ -1,0 +1,6 @@
+{
+  "name": "Agri-Link",
+  "description": "Plateforme agricole de gestion, vente directe et précommandes agricoles au Sénégal.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

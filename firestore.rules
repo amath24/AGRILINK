@@ -1,0 +1,138 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        (request.auth.token.role == 'ADMIN') ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         getUserData().role == 'ADMIN')
+      );
+    }
+
+    function isProducer() {
+      return isAuthenticated() && (
+        getUserData().role == 'PRODUCER' || isAdmin()
+      );
+    }
+
+    function isBuyer() {
+      return isAuthenticated() && (
+        getUserData().role == 'BUYER' || isAdmin()
+      );
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      // Allow user creation on registration, but cannot set themselves as ADMIN unless already admin
+      allow create: if isOwner(userId) && request.resource.data.role != 'ADMIN';
+      allow update: if isOwner(userId) && request.resource.data.role == resource.data.role || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Producer profiles
+    match /producerProfiles/{producerId} {
+      allow read: if true; // Public directory info for products & verification
+      allow create: if isOwner(producerId) || isAdmin();
+      // Validation status can only be modified by admin
+      allow update: if isAdmin() || (isOwner(producerId) && request.resource.data.validationStatus == resource.data.validationStatus);
+      allow delete: if isAdmin();
+    }
+
+    // Buyer profiles
+    match /buyerProfiles/{buyerId} {
+      allow read: if isOwner(buyerId) || isAdmin();
+      allow create, update: if isOwner(buyerId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Products collection: public readable for published products
+    match /products/{productId} {
+      allow read: if resource.data.status == 'PUBLISHED' || isAuthenticated();
+      allow create: if isProducer() && (request.resource.data.producerId == request.auth.uid || isAdmin());
+      allow update, delete: if isProducer() && (resource.data.producerId == request.auth.uid || isAdmin());
+    }
+
+    // Inventory collection
+    match /inventory/{productId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isProducer() && (request.resource.data.producerId == request.auth.uid || resource.data.producerId == request.auth.uid || isAdmin());
+    }
+
+    // Preorders collection
+    match /preorders/{preorderId} {
+      allow read: if isAuthenticated() && (resource.data.buyerId == request.auth.uid || resource.data.producerId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && (request.resource.data.buyerId == request.auth.uid || isAdmin());
+      allow update: if isAuthenticated() && (resource.data.buyerId == request.auth.uid || resource.data.producerId == request.auth.uid || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // Orders collection
+    match /orders/{orderId} {
+      allow read: if isAuthenticated() && (resource.data.buyerId == request.auth.uid || resource.data.producerId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && (request.resource.data.buyerId == request.auth.uid || isAdmin());
+      allow update: if isAuthenticated() && (resource.data.buyerId == request.auth.uid || resource.data.producerId == request.auth.uid || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // Payments collection
+    match /payments/{paymentId} {
+      allow read: if isAuthenticated() && (resource.data.buyerId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && (request.resource.data.buyerId == request.auth.uid || isAdmin());
+      allow update, delete: if isAdmin();
+    }
+
+    // Productions collection
+    match /productions/{productionId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isProducer() && (request.resource.data.producerId == request.auth.uid || resource.data.producerId == request.auth.uid || isAdmin());
+    }
+
+    // Farms collection
+    match /farms/{farmId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isProducer() && (request.resource.data.producerId == request.auth.uid || resource.data.producerId == request.auth.uid || isAdmin());
+    }
+
+    // Plots collection
+    match /plots/{plotId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isProducer() && (request.resource.data.producerId == request.auth.uid || resource.data.producerId == request.auth.uid || isAdmin());
+    }
+
+    // Deliveries collection
+    match /deliveries/{deliveryId} {
+      allow read: if isAuthenticated() && (resource.data.buyerId == request.auth.uid || resource.data.producerId == request.auth.uid || isAdmin());
+      allow create, update: if isAuthenticated() && (resource.data.producerId == request.auth.uid || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // Traceability collection: public readable for consumers scanning QR code
+    match /traceability/{lotNumber} {
+      allow read: if true;
+      allow create, update, delete: if isProducer() || isAdmin();
+    }
+
+    // Notifications collection
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+  }
+}
