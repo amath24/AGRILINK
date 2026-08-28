@@ -101,16 +101,16 @@ export const PreorderFlowModal: React.FC<PreorderFlowModalProps> = ({
   return (
     <div
       id="preorder-flow-backdrop"
-      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
         id="preorder-flow-modal-card"
-        className="bg-[#FAF8F2] border border-[#c1c9be] rounded-2xl sm:rounded-3xl w-full max-w-xl shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[90vh] my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-150 relative"
+        className="bg-[#FAF8F2] border border-[#c1c9be] rounded-2xl sm:rounded-3xl w-full max-w-xl min-w-[300px] sm:min-w-[500px] shadow-2xl max-h-[90vh] overflow-y-auto relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="bg-white border-b border-[#c1c9be]/60 px-5 sm:px-6 py-4 flex justify-between items-center shrink-0 z-10">
+        <div className="bg-white border-b border-[#c1c9be]/60 px-5 sm:px-6 py-4 flex justify-between items-center sticky top-0 z-20">
           <div className="flex items-center gap-2.5">
             <span className="w-8 h-8 rounded-full bg-[#164525] text-white flex items-center justify-center font-['Montserrat'] font-bold text-[14px] shadow-xs">
               {step === 'form' ? '1' : step === 'confirmation' ? '✓' : '2'}
@@ -142,8 +142,8 @@ export const PreorderFlowModal: React.FC<PreorderFlowModalProps> = ({
           )}
         </div>
 
-        {/* Modal Body - Scrollable */}
-        <div className="p-4 sm:p-6 overflow-y-auto flex-1 flex flex-col gap-4">
+        {/* Modal Body */}
+        <div className="p-4 sm:p-6 flex flex-col gap-4">
           {/* STEP 1: PREORDER FORM */}
           {step === 'form' && (
             <form onSubmit={handleProceedToPayment} className="flex flex-col gap-5">

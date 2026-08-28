@@ -115,45 +115,49 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
                 Suivi Commande
               </button>
 
-              <button
-                id="nav-buyer-space-btn"
-                onClick={() => onOpenBuyerSpace('dashboard')}
-                className={`px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
-                  currentView === 'buyer' && currentBuyerTab !== 'preorders'
-                    ? 'text-[#164525] font-bold border-b-2 border-[#164525]'
-                    : 'text-[#414941] hover:text-[#164525] hover:bg-[#fff1e6]'
-                }`}
-              >
-                <span className="material-symbols-outlined text-[17px]">shopping_basket</span>
-                Espace Acheteur
-              </button>
+              {user && (
+                <>
+                  <button
+                    id="nav-buyer-space-btn"
+                    onClick={() => onOpenBuyerSpace('dashboard')}
+                    className={`px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
+                      currentView === 'buyer' && currentBuyerTab !== 'preorders'
+                        ? 'text-[#164525] font-bold border-b-2 border-[#164525]'
+                        : 'text-[#414941] hover:text-[#164525] hover:bg-[#fff1e6]'
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[17px]">shopping_basket</span>
+                    Espace Acheteur
+                  </button>
 
-              <button
-                id="nav-producer-space-btn"
-                onClick={onOpenProducerSpace}
-                className={`px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
-                  currentView === 'producer'
-                    ? 'bg-[#164525] text-white font-bold shadow-xs'
-                    : 'text-[#164525] font-semibold bg-[#164525]/10 hover:bg-[#164525]/20'
-                }`}
-              >
-                <span className="material-symbols-outlined text-[17px]">agriculture</span>
-                Espace Producteur
-              </button>
+                  <button
+                    id="nav-producer-space-btn"
+                    onClick={onOpenProducerSpace}
+                    className={`px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
+                      currentView === 'producer'
+                        ? 'bg-[#164525] text-white font-bold shadow-xs'
+                        : 'text-[#164525] font-semibold bg-[#164525]/10 hover:bg-[#164525]/20'
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[17px]">agriculture</span>
+                    Espace Producteur
+                  </button>
 
-              {onOpenAdminSpace && (
-                <button
-                  id="nav-admin-space-btn"
-                  onClick={onOpenAdminSpace}
-                  className={`px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
-                    currentView === 'admin'
-                      ? 'bg-[#2b1700] text-white font-bold shadow-xs'
-                      : 'text-[#2b1700] font-semibold bg-[#2b1700]/10 hover:bg-[#2b1700]/20'
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-[17px]">admin_panel_settings</span>
-                  Admin
-                </button>
+                  {onOpenAdminSpace && (
+                    <button
+                      id="nav-admin-space-btn"
+                      onClick={onOpenAdminSpace}
+                      className={`px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
+                        currentView === 'admin'
+                          ? 'bg-[#2b1700] text-white font-bold shadow-xs'
+                          : 'text-[#2b1700] font-semibold bg-[#2b1700]/10 hover:bg-[#2b1700]/20'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-[17px]">admin_panel_settings</span>
+                      Admin
+                    </button>
+                  )}
+                </>
               )}
             </nav>
           </div>
@@ -186,60 +190,62 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
 
             {/* Action Buttons */}
             <div className="flex items-center gap-1.5 sm:gap-2 relative">
-              {/* Notification Bell */}
-              <button
-                id="notifications-header-btn"
-                onClick={onOpenNotifications}
-                className="relative p-2 text-[#414941] hover:text-[#164525] hover:bg-[#fff1e6] rounded-full transition-colors cursor-pointer flex items-center justify-center"
-                title="Notifications"
-              >
-                <span className="material-symbols-outlined text-[22px]">notifications</span>
-                {unreadNotificationsCount > 0 && (
-                  <span className="absolute top-1 right-1 bg-[#e63946] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                    {unreadNotificationsCount}
-                  </span>
-                )}
-              </button>
+              {user ? (
+                <>
+                  {/* Notification Bell */}
+                  <button
+                    id="notifications-header-btn"
+                    onClick={onOpenNotifications}
+                    className="relative p-2 text-[#414941] hover:text-[#164525] hover:bg-[#fff1e6] rounded-full transition-colors cursor-pointer flex items-center justify-center"
+                    title="Notifications"
+                  >
+                    <span className="material-symbols-outlined text-[22px]">notifications</span>
+                    {unreadNotificationsCount > 0 && (
+                      <span className="absolute top-1 right-1 bg-[#e63946] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                        {unreadNotificationsCount}
+                      </span>
+                    )}
+                  </button>
 
-              {/* Preorders / Cart shortcut */}
-              <button
-                id="preorders-cart-btn"
-                onClick={() => onOpenBuyerSpace('preorders')}
-                className={`relative p-2 rounded-full transition-colors cursor-pointer flex items-center justify-center ${
-                  currentView === 'buyer' && currentBuyerTab === 'preorders'
-                    ? 'text-[#164525] bg-[#bbefc1]/50'
-                    : 'text-[#414941] hover:text-[#164525] hover:bg-[#fff1e6]'
-                }`}
-                title="Mes précommandes de récoltes"
-              >
-                <span className="material-symbols-outlined text-[22px]">shopping_cart</span>
-                {preordersCount > 0 && (
-                  <span className="absolute top-0.5 right-0.5 bg-[#164525] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center border-2 border-[#FAF8F2]">
-                    {preordersCount}
-                  </span>
-                )}
-              </button>
-              
-              {/* Account Profile Button with Menu Trigger */}
-              <div className="relative">
-                <button
-                  id="account-profile-btn"
-                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 text-[#2b1700] hover:bg-[#fff1e6] rounded-full transition-colors cursor-pointer border border-[#c1c9be]/60"
-                  title="Mon compte et session"
-                >
-                  <div className={`w-6 h-6 rounded-full text-white flex items-center justify-center text-[11px] font-bold ${
-                    role === 'ADMIN' ? 'bg-[#2b1700]' : role === 'PRODUCER' ? 'bg-[#7d4600]' : 'bg-[#164525]'
-                  }`}>
-                    {userInitial}
-                  </div>
-                  <span className="hidden sm:inline text-[13px] font-semibold text-[#164525] truncate max-w-[100px]">
-                    {displayName.split(' ')[0]}
-                  </span>
-                  <span className="material-symbols-outlined text-[16px] text-[#717970]">
-                    expand_more
-                  </span>
-                </button>
+                  {/* Preorders / Cart shortcut */}
+                  <button
+                    id="preorders-cart-btn"
+                    onClick={() => onOpenBuyerSpace('preorders')}
+                    className={`relative p-2 rounded-full transition-colors cursor-pointer flex items-center justify-center ${
+                      currentView === 'buyer' && currentBuyerTab === 'preorders'
+                        ? 'text-[#164525] bg-[#bbefc1]/50'
+                        : 'text-[#414941] hover:text-[#164525] hover:bg-[#fff1e6]'
+                    }`}
+                    title="Mes précommandes de récoltes"
+                  >
+                    <span className="material-symbols-outlined text-[22px]">shopping_cart</span>
+                    {preordersCount > 0 && (
+                      <span className="absolute top-0.5 right-0.5 bg-[#164525] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center border-2 border-[#FAF8F2]">
+                        {preordersCount}
+                      </span>
+                    )}
+                  </button>
+                  
+                  {/* Account Profile Button with Menu Trigger */}
+                  <div className="relative">
+                    <button
+                      id="account-profile-btn"
+                      onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                      className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 text-[#2b1700] hover:bg-[#fff1e6] rounded-full transition-colors cursor-pointer border border-[#c1c9be]/60"
+                      title="Mon compte et session"
+                    >
+                      <div className={`w-6 h-6 rounded-full text-white flex items-center justify-center text-[11px] font-bold ${
+                        role === 'ADMIN' ? 'bg-[#2b1700]' : role === 'PRODUCER' ? 'bg-[#7d4600]' : 'bg-[#164525]'
+                      }`}>
+                        {userInitial}
+                      </div>
+                      <span className="hidden sm:inline text-[13px] font-semibold text-[#164525] truncate max-w-[100px]">
+                        {displayName.split(' ')[0]}
+                      </span>
+                      <span className="material-symbols-outlined text-[16px] text-[#717970]">
+                        expand_more
+                      </span>
+                    </button>
 
                 {/* User Session Dropdown */}
                 {isUserMenuOpen && (
@@ -381,15 +387,24 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
                   </div>
                 )}
               </div>
+              </>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => onNavigate('login')}
+                    className="text-[#164525] font-semibold text-[13px] hover:bg-[#164525]/10 px-4 py-2 rounded-xl transition-colors cursor-pointer"
+                  >
+                    Se connecter
+                  </button>
+                  <button
+                    onClick={() => onNavigate('register')}
+                    className="bg-[#164525] text-white font-semibold text-[13px] hover:bg-[#2f5d3a] px-4 py-2 rounded-xl transition-colors cursor-pointer shadow-sm hidden sm:block"
+                  >
+                    S'inscrire
+                  </button>
+                </div>
+              )}
             </div>
-
-            <button
-              id="signup-header-btn"
-              onClick={() => onNavigate(user ? 'marketplace' : 'login')}
-              className="bg-[#164525] text-white font-medium text-[13px] px-4 py-2 rounded-full hover:bg-[#2f5d3a] hover:-translate-y-0.5 transition-all shadow-[0_8px_30px_rgba(47,93,58,0.12)] cursor-pointer hidden sm:block"
-            >
-              {user ? 'Marketplace' : 'Connexion'}
-            </button>
           </div>
         </div>
       </header>

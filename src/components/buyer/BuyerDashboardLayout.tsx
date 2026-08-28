@@ -108,7 +108,7 @@ export const BuyerDashboardLayout: React.FC<BuyerDashboardLayoutProps> = ({
       {/* Main Container with Sidebar + Content */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
         {/* Sidebar (1 col) */}
-        <aside className="lg:col-span-1 bg-white border border-[#c1c9be] rounded-2xl p-5 shadow-sm flex flex-col gap-6 sticky top-24">
+        <aside className="lg:col-span-1 bg-white border border-[#c1c9be] rounded-2xl p-4 lg:p-5 shadow-sm flex flex-col gap-4 lg:gap-6 lg:sticky lg:top-24">
           {/* User Profile Mini Badge */}
           <div className="flex items-center gap-3 pb-5 border-b border-[#c1c9be]/50">
             <div className="w-12 h-12 rounded-full bg-[#164525] text-white flex items-center justify-center font-['Montserrat'] font-bold text-[18px]">
@@ -128,7 +128,7 @@ export const BuyerDashboardLayout: React.FC<BuyerDashboardLayoutProps> = ({
           </div>
 
           {/* Navigation Links */}
-          <nav className="flex flex-col gap-1.5">
+          <nav className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 scrollbar-hide -mx-2 px-2 lg:mx-0 lg:px-0">
             {navItems.map((item) => {
               const isActive = activeTab === item.id;
 
@@ -137,7 +137,7 @@ export const BuyerDashboardLayout: React.FC<BuyerDashboardLayoutProps> = ({
                   key={item.id}
                   id={`buyer-tab-${item.id}`}
                   onClick={() => onTabChange(item.id)}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[14px] font-medium transition-all cursor-pointer text-left ${
+                  className={`flex-shrink-0 lg:w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[14px] font-medium transition-all cursor-pointer text-left whitespace-nowrap gap-4 ${
                     isActive
                       ? 'bg-[#164525] text-white font-semibold shadow-sm'
                       : 'text-[#414941] hover:bg-[#FAF8F2] hover:text-[#164525]'
@@ -171,7 +171,7 @@ export const BuyerDashboardLayout: React.FC<BuyerDashboardLayoutProps> = ({
           </nav>
 
           {/* Guarantee Note */}
-          <div className="mt-auto pt-4 border-t border-[#c1c9be]/50 bg-[#FAF8F2] -mx-5 -mb-5 p-4 rounded-b-2xl flex items-center gap-2.5">
+          <div className="hidden lg:flex mt-auto pt-4 border-t border-[#c1c9be]/50 bg-[#FAF8F2] -mx-5 -mb-5 p-4 rounded-b-2xl items-center gap-2.5">
             <span className="material-symbols-outlined text-[#164525] text-[22px]">security</span>
             <div className="text-[11px] text-[#414941]">
               <strong className="text-[#164525] block">Sécurité Séquestre</strong>

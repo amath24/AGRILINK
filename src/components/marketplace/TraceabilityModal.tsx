@@ -10,15 +10,15 @@ export const TraceabilityModal: React.FC<TraceabilityModalProps> = ({ product, o
   return (
     <div
       id="traceability-modal-backdrop"
-      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
         id="traceability-modal-content"
-        className="bg-[#FAF8F2] border border-[#c1c9be] rounded-2xl sm:rounded-3xl w-full max-w-lg shadow-2xl flex flex-col max-h-[92vh] my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+        className="bg-[#FAF8F2] border border-[#c1c9be] rounded-2xl sm:rounded-3xl w-full max-w-lg min-w-[300px] sm:min-w-[500px] shadow-2xl max-h-[90vh] overflow-y-auto relative"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="bg-white border-b border-[#c1c9be]/60 px-5 sm:px-6 py-4 flex justify-between items-center shrink-0">
+        <div className="bg-white border-b border-[#c1c9be]/60 px-5 sm:px-6 py-4 flex justify-between items-center sticky top-0 z-20">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-[#164525] text-[24px]">qr_code_scanner</span>
             <h2 className="font-['Montserrat'] text-[18px] font-bold text-[#164525]">
@@ -33,7 +33,7 @@ export const TraceabilityModal: React.FC<TraceabilityModalProps> = ({ product, o
           </button>
         </div>
 
-        <div className="p-4 sm:p-6 flex flex-col gap-4 overflow-y-auto flex-1">
+        <div className="p-4 sm:p-6 flex flex-col gap-4">
           {/* Header Lot */}
           <div className="flex items-center gap-4 bg-white p-4 rounded-xl border border-[#c1c9be]">
             <img
