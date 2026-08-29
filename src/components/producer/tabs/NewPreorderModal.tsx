@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { CropProduction, ProductCategory, Product } from '../../../types';
+import { ImageUploadInput } from '../../common/ImageUploadInput';
 
 interface NewPreorderModalProps {
   isOpen: boolean;
@@ -241,37 +242,13 @@ export const NewPreorderModal: React.FC<NewPreorderModalProps> = ({
             </div>
           </div>
 
-          {/* Photo Selector */}
-          <div>
-            <label className="block text-[13px] font-semibold text-[#2b1700] mb-1">
-              Photo du produit (URL ou sélection rapide)
-            </label>
-            <div className="flex gap-2 mb-2">
-              <input
-                type="url"
-                value={photoUrl}
-                onChange={(e) => setPhotoUrl(e.target.value)}
-                className="flex-1 px-3.5 py-2 bg-[#FAF8F2] border border-[#c1c9be] rounded-xl text-[13px] text-[#2b1700] focus:border-[#164525] focus:outline-none"
-              />
-            </div>
-            <div className="flex items-center gap-2 overflow-x-auto pb-1">
-              <span className="text-[11px] text-[#717970] whitespace-nowrap">Suggestions :</span>
-              {sampleImages.map((img, i) => (
-                <button
-                  type="button"
-                  key={i}
-                  onClick={() => setPhotoUrl(img.url)}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-colors cursor-pointer whitespace-nowrap ${
-                    photoUrl === img.url
-                      ? 'bg-[#164525] text-white border-[#164525]'
-                      : 'bg-[#FAF8F2] text-[#414941] border-[#c1c9be]'
-                  }`}
-                >
-                  {img.name}
-                </button>
-              ))}
-            </div>
-          </div>
+          {/* Photo Selector with direct device upload, camera & drag and drop */}
+          <ImageUploadInput
+            value={photoUrl}
+            onChange={setPhotoUrl}
+            label="Photo de la récolte / produit *"
+            required
+          />
 
           {/* Description */}
           <div>
