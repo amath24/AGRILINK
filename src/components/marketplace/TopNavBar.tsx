@@ -394,69 +394,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
         </div>
       </header>
 
-      {/* Mobile Bottom Navigation Bar for quick and seamless one-touch access */}
-      <nav className="md:hidden fixed bottom-0 left-0 w-full z-40 bg-white border-t border-[#c1c9be] py-1 px-2 flex justify-around items-center shadow-lg">
-        <button
-          onClick={() => onNavigate('marketplace')}
-          className={`flex flex-col items-center py-1 px-2 rounded-xl transition-colors cursor-pointer ${
-            currentView === 'marketplace' || currentView === 'detail'
-              ? 'text-[#164525] font-bold'
-              : 'text-[#717970]'
-          }`}
-        >
-          <span className="material-symbols-outlined text-[20px]">storefront</span>
-          <span className="text-[10px]">Marché</span>
-        </button>
 
-        <button
-          onClick={() => onOpenBuyerSpace('preorders')}
-          className={`flex flex-col items-center py-1 px-2 rounded-xl transition-colors cursor-pointer relative ${
-            currentView === 'buyer' && currentBuyerTab === 'preorders'
-              ? 'text-[#164525] font-bold'
-              : 'text-[#717970]'
-          }`}
-        >
-          <span className="material-symbols-outlined text-[20px]">receipt_long</span>
-          <span className="text-[10px]">Précommandes</span>
-          {preordersCount > 0 && (
-            <span className="absolute top-0 right-1 bg-[#164525] text-white text-[9px] font-bold rounded-full w-3.5 h-3.5 flex items-center justify-center">
-              {preordersCount}
-            </span>
-          )}
-        </button>
-
-        <button
-          onClick={() => onNavigate('tracking')}
-          className={`flex flex-col items-center py-1 px-2 rounded-xl transition-colors cursor-pointer ${
-            currentView === 'tracking' ? 'text-[#164525] font-bold' : 'text-[#717970]'
-          }`}
-        >
-          <span className="material-symbols-outlined text-[20px]">local_shipping</span>
-          <span className="text-[10px]">Suivi</span>
-        </button>
-
-        <button
-          onClick={onOpenProducerSpace}
-          className={`flex flex-col items-center py-1 px-2 rounded-xl transition-colors cursor-pointer ${
-            currentView === 'producer' ? 'text-[#7d4600] font-bold' : 'text-[#717970]'
-          }`}
-        >
-          <span className="material-symbols-outlined text-[20px]">agriculture</span>
-          <span className="text-[10px]">Producteur</span>
-        </button>
-
-        <button
-          onClick={() => onOpenBuyerSpace('dashboard')}
-          className={`flex flex-col items-center py-1 px-2 rounded-xl transition-colors cursor-pointer ${
-            currentView === 'buyer' && currentBuyerTab !== 'preorders'
-              ? 'text-[#164525] font-bold'
-              : 'text-[#717970]'
-          }`}
-        >
-          <span className="material-symbols-outlined text-[20px]">person</span>
-          <span className="text-[10px]">Espace</span>
-        </button>
-      </nav>
     </>
   );
 };
