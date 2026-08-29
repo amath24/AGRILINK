@@ -54,8 +54,17 @@ export const StockMovementModal: React.FC<StockMovementModalProps> = ({
   };
 
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto border border-[#c1c9be] shadow-2xl p-6 sm:p-8">
+    <div
+      className="modal-backdrop"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div style={{ display: 'flex', width: '100%', minHeight: '100%', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+        <div
+          className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 sm:p-8 text-left shadow-2xl border border-[#c1c9be]"
+          onClick={(e) => e.stopPropagation()}
+        >
         <div className="flex items-center justify-between pb-4 border-b border-[#c1c9be]/50">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-xl bg-[#164525]/10 text-[#164525] flex items-center justify-center">
@@ -193,6 +202,7 @@ export const StockMovementModal: React.FC<StockMovementModalProps> = ({
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>,
     document.body

@@ -121,7 +121,7 @@ export const TraceabilityTab: React.FC<TraceabilityTabProps> = ({ lots }) => {
 
       {/* QR Code & Lot Detail Modal */}
       {selectedLot && (
-        <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 w-full h-full flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl w-full max-w-md p-6 border border-[#c1c9be] shadow-2xl text-center">
             <div className="flex justify-between items-start pb-2">
               <span className="text-[11px] font-bold text-[#164525] bg-[#164525]/10 px-2.5 py-0.5 rounded-full">
