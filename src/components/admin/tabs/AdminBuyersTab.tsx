@@ -166,7 +166,7 @@ export const AdminBuyersTab: React.FC<AdminBuyersTabProps> = ({
 
       {/* Modal Détail Acheteur */}
       {selectedBuyer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 border border-[#c1c9be] shadow-xl animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-4 border-b border-[#c1c9be]/40">
               <div className="flex items-center gap-3">

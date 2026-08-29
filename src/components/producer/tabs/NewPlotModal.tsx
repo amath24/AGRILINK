@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 import { Plot, PlotStatus } from '../../../types';
 
 interface NewPlotModalProps {
@@ -64,8 +65,10 @@ export const NewPlotModal: React.FC<NewPlotModalProps> = ({
     setError('');
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+  if (!isOpen) return null;
+
+  return ReactDOM.createPortal(
+    <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto border border-[#c1c9be] shadow-2xl p-6 sm:p-8">
         <div className="flex items-center justify-between pb-4 border-b border-[#c1c9be]/50">
           <div className="flex items-center gap-2.5">
@@ -290,6 +293,7 @@ export const NewPlotModal: React.FC<NewPlotModalProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

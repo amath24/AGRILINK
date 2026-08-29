@@ -180,7 +180,7 @@ export const DeliveriesTab: React.FC<DeliveriesTabProps> = ({
 
       {/* Simulated Tracking Map / Modal */}
       {selectedDeliveryForTracking && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl w-full max-w-lg p-6 border border-[#c1c9be] shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-[#c1c9be]/50">
               <div className="flex items-center gap-2">

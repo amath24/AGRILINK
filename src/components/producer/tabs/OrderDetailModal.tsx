@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import { ProducerOrder, ProducerOrderStatus } from '../../../types';
 
 interface OrderDetailModalProps {
@@ -63,8 +64,8 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
 
   const currentStepIndex = timelineSteps.findIndex((s) => s.id === order.statut);
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+  return ReactDOM.createPortal(
+    <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-[#c1c9be] shadow-2xl p-6 sm:p-8">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-[#c1c9be]/50">
@@ -257,6 +258,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

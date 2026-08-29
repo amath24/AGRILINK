@@ -429,7 +429,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
                       * Les profils producteurs sont validés avec notre équipe pour garantir l'origine certifiée des lots.
                     </p>
                   </div>
-                ) : (
+                ) : role === 'BUYER' ? (
                   <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-[#164525]/5 border border-[#164525]/20 space-y-3">
                     <div className="flex items-center gap-2 text-[#164525] font-bold text-[13px] sm:text-[14px]">
                       <span className="material-symbols-outlined text-[18px]">storefront</span>
@@ -497,6 +497,16 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
                         />
                       </div>
                     </div>
+                  </div>
+                ) : (
+                  <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-[#2b1700]/5 border border-[#2b1700]/20 space-y-3">
+                    <div className="flex items-center gap-2 text-[#2b1700] font-bold text-[13px] sm:text-[14px]">
+                      <span className="material-symbols-outlined text-[18px]">admin_panel_settings</span>
+                      Profil Administrateur
+                    </div>
+                    <p className="text-[12px] text-[#2b1700]/80 leading-relaxed">
+                      Ce compte vous octroiera tous les privilèges d'administration (gestion des utilisateurs, validation des producteurs, supervision des commandes, etc.).
+                    </p>
                   </div>
                 )}
 

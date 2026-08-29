@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 import { StockItem, StockMovement, StockMovementType } from '../../../types';
 
 interface StockMovementModalProps {
@@ -52,8 +53,8 @@ export const StockMovementModal: React.FC<StockMovementModalProps> = ({
     onClose();
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+  return ReactDOM.createPortal(
+    <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto border border-[#c1c9be] shadow-2xl p-6 sm:p-8">
         <div className="flex items-center justify-between pb-4 border-b border-[#c1c9be]/50">
           <div className="flex items-center gap-2.5">
@@ -109,7 +110,7 @@ export const StockMovementModal: React.FC<StockMovementModalProps> = ({
             <label className="block text-[13px] font-semibold text-[#2b1700] mb-1">
               Type d'opération *
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {[
                 { id: 'Entrée', label: 'Entrée (Récolte/Achat)', icon: 'add_circle' },
                 { id: 'Sortie', label: 'Sortie (Livraison/Perte)', icon: 'remove_circle' },
@@ -135,7 +136,7 @@ export const StockMovementModal: React.FC<StockMovementModalProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-[13px] font-semibold text-[#2b1700] mb-1">
                 Quantité ({currentItem?.unite || 'kg'}) *
@@ -193,6 +194,7 @@ export const StockMovementModal: React.FC<StockMovementModalProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

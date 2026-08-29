@@ -73,7 +73,7 @@ export const TraceabilityTab: React.FC<TraceabilityTabProps> = ({ lots }) => {
                 <div className="flex justify-between">
                   <span className="text-[#717970]">Quantité du lot :</span>
                   <span className="font-bold text-[#2b1700]">
-                    {lot.quantiteKg} {lot.unite}
+                    {lot.quantiteLot} {lot.unite}
                   </span>
                 </div>
               </div>
@@ -83,7 +83,7 @@ export const TraceabilityTab: React.FC<TraceabilityTabProps> = ({ lots }) => {
                   Intrants & Soins apportés :
                 </span>
                 <div className="flex flex-wrap gap-1">
-                  {lot.intrants.map((intrant, i) => (
+                  {lot.intrantsBio.map((intrant, i) => (
                     <span
                       key={i}
                       className="text-[10px] font-medium bg-emerald-50 text-emerald-900 border border-emerald-200 px-2 py-0.5 rounded-md"
@@ -121,7 +121,7 @@ export const TraceabilityTab: React.FC<TraceabilityTabProps> = ({ lots }) => {
 
       {/* QR Code & Lot Detail Modal */}
       {selectedLot && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl w-full max-w-md p-6 border border-[#c1c9be] shadow-2xl text-center">
             <div className="flex justify-between items-start pb-2">
               <span className="text-[11px] font-bold text-[#164525] bg-[#164525]/10 px-2.5 py-0.5 rounded-full">
@@ -147,7 +147,7 @@ export const TraceabilityTab: React.FC<TraceabilityTabProps> = ({ lots }) => {
                 Lot #{selectedLot.numeroLot}
               </h3>
               <p className="text-[13px] text-[#164525] font-semibold">
-                {selectedLot.produitNom} ({selectedLot.quantiteKg} {selectedLot.unite})
+                {selectedLot.produitNom} ({selectedLot.quantiteLot} {selectedLot.unite})
               </p>
             </div>
 
@@ -165,7 +165,7 @@ export const TraceabilityTab: React.FC<TraceabilityTabProps> = ({ lots }) => {
                 <strong>Date de récolte :</strong> {selectedLot.dateRecolte}
               </div>
               <div>
-                <strong>Transporteur certifié :</strong> {selectedLot.transporteur}
+                <strong>Transporteur certifié :</strong> Diallo Logistique Teranga
               </div>
             </div>
 

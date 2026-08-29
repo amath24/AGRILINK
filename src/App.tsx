@@ -362,11 +362,19 @@ export default function App() {
   };
 
   const handleQuickPreorder = (product: Product) => {
+    if (!user) {
+      setCurrentView('login');
+      return;
+    }
     setPreorderModalProduct(product);
     setPreorderInitialQty(product.quantiteMinimale || 1);
   };
 
   const handleStartPreorderFromDetail = (product: Product, quantity: number) => {
+    if (!user) {
+      setCurrentView('login');
+      return;
+    }
     setPreorderModalProduct(product);
     setPreorderInitialQty(quantity);
   };
@@ -1090,7 +1098,23 @@ export default function App() {
             payments={payments}
             favoriteProducts={favoriteProducts}
             notifications={notifications}
-            buyerProfile={buyerProfile}
+            buyerProfile={{
+              id: profile?.uid || buyerProfile?.id || 'unknown',
+              prenom: profile?.firstName || buyerProfile?.prenom || 'Acheteur',
+              nom: profile?.lastName || buyerProfile?.nom || '',
+              email: profile?.email || buyerProfile?.email || '',
+              telephone: profile?.phone || buyerProfile?.telephone || '',
+              typeAcheteur: (buyerProfile as any)?.buyerType || buyerProfile?.typeAcheteur || 'INDIVIDUAL',
+              nomEntreprise: (buyerProfile as any)?.companyName || buyerProfile?.nomEntreprise || '',
+              ninea: buyerProfile?.ninea || '',
+              adresse: (buyerProfile as any)?.address || buyerProfile?.adresse || '',
+              ville: (buyerProfile as any)?.city || buyerProfile?.ville || '',
+              region: buyerProfile?.region || 'Dakar',
+              preferencesCommunication: buyerProfile?.preferencesCommunication || { email: true, sms: false, whatsapp: false },
+              dateInscription: profile?.createdAt || buyerProfile?.dateInscription || new Date().toISOString(),
+              statutCompte: profile?.status === 'ACTIVE' ? 'actif' : 'en_attente',
+              codeClient: buyerProfile?.codeClient || `CL-${(profile?.uid || '1234').substring(0, 4).toUpperCase()}`,
+            }}
             onUpdateProfile={setBuyerProfile}
             onSelectPreorder={(po) => setSelectedPreorderForModal(po)}
             onOpenReceipt={(data) => setSelectedReceiptData(data)}
@@ -1201,11 +1225,11 @@ export default function App() {
                 prev.map((inc) =>
                   inc.id === incId
                     ? {
-                        ...inc,
-                        statut: 'Résolu',
-                        dateResolution: new Date().toISOString().split('T')[0],
-                        notesResolution: notes,
-                      }
+                      ...inc,
+                      statut: 'Résolu',
+                      dateResolution: new Date().toISOString().split('T')[0],
+                      notesResolution: notes,
+                    }
                     : inc
                 )
               );

@@ -84,66 +84,41 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
                 Offres &amp; Marché
               </button>
 
-              <button
-                id="nav-preorders-btn"
-                onClick={() => onOpenBuyerSpace('preorders')}
-                className={`px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
-                  currentView === 'buyer' && currentBuyerTab === 'preorders'
-                    ? 'text-[#164525] font-bold border-b-2 border-[#164525] bg-[#164525]/5'
-                    : 'text-[#414941] hover:text-[#164525] hover:bg-[#fff1e6]'
-                }`}
-              >
-                <span className="material-symbols-outlined text-[18px]">receipt_long</span>
-                Précommandes
-                {preordersCount > 0 && (
-                  <span className="ml-0.5 px-1.5 py-0.2 bg-[#164525] text-white text-[10px] font-bold rounded-full">
-                    {preordersCount}
-                  </span>
-                )}
-              </button>
 
-              <button
-                id="nav-tracking-btn"
-                onClick={() => onNavigate('tracking')}
-                className={`px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
-                  currentView === 'tracking'
-                    ? 'text-[#164525] font-bold border-b-2 border-[#164525] bg-[#164525]/5'
-                    : 'text-[#414941] hover:text-[#164525] hover:bg-[#fff1e6]'
-                }`}
-              >
-                <span className="material-symbols-outlined text-[18px]">local_shipping</span>
-                Suivi Commande
-              </button>
 
               {user && (
                 <>
-                  <button
-                    id="nav-buyer-space-btn"
-                    onClick={() => onOpenBuyerSpace('dashboard')}
-                    className={`px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
-                      currentView === 'buyer' && currentBuyerTab !== 'preorders'
-                        ? 'text-[#164525] font-bold border-b-2 border-[#164525]'
-                        : 'text-[#414941] hover:text-[#164525] hover:bg-[#fff1e6]'
-                    }`}
-                  >
-                    <span className="material-symbols-outlined text-[17px]">shopping_basket</span>
-                    Espace Acheteur
-                  </button>
+                  {(role === 'BUYER' || role === 'ADMIN') && (
+                    <button
+                      id="nav-buyer-space-btn"
+                      onClick={() => onOpenBuyerSpace('dashboard')}
+                      className={`px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
+                        currentView === 'buyer' && currentBuyerTab !== 'preorders'
+                          ? 'text-[#164525] font-bold border-b-2 border-[#164525]'
+                          : 'text-[#414941] hover:text-[#164525] hover:bg-[#fff1e6]'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-[17px]">shopping_basket</span>
+                      Espace Acheteur
+                    </button>
+                  )}
 
-                  <button
-                    id="nav-producer-space-btn"
-                    onClick={onOpenProducerSpace}
-                    className={`px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
-                      currentView === 'producer'
-                        ? 'bg-[#164525] text-white font-bold shadow-xs'
-                        : 'text-[#164525] font-semibold bg-[#164525]/10 hover:bg-[#164525]/20'
-                    }`}
-                  >
-                    <span className="material-symbols-outlined text-[17px]">agriculture</span>
-                    Espace Producteur
-                  </button>
+                  {(role === 'PRODUCER' || role === 'ADMIN') && (
+                    <button
+                      id="nav-producer-space-btn"
+                      onClick={onOpenProducerSpace}
+                      className={`px-3 py-1.5 rounded-lg transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
+                        currentView === 'producer'
+                          ? 'bg-[#164525] text-white font-bold shadow-xs'
+                          : 'text-[#164525] font-semibold bg-[#164525]/10 hover:bg-[#164525]/20'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-[17px]">agriculture</span>
+                      Espace Producteur
+                    </button>
+                  )}
 
-                  {onOpenAdminSpace && (
+                  {role === 'ADMIN' && onOpenAdminSpace && (
                     <button
                       id="nav-admin-space-btn"
                       onClick={onOpenAdminSpace}

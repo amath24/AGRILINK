@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 import { CropProduction, Plot, ProductCategory, ProductionStatus } from '../../../types';
 
 interface NewProductionModalProps {
@@ -70,8 +71,8 @@ export const NewProductionModal: React.FC<NewProductionModalProps> = ({
     setError('');
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+  return ReactDOM.createPortal(
+    <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto border border-[#c1c9be] shadow-2xl p-6 sm:p-8">
         <div className="flex items-center justify-between pb-4 border-b border-[#c1c9be]/50">
           <div className="flex items-center gap-2.5">
@@ -154,7 +155,7 @@ export const NewProductionModal: React.FC<NewProductionModalProps> = ({
             </select>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-[13px] font-semibold text-[#2b1700] mb-1">
                 Quantité prévue *
@@ -189,7 +190,7 @@ export const NewProductionModal: React.FC<NewProductionModalProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-[13px] font-semibold text-[#2b1700] mb-1">
                 Date de début du cycle
@@ -217,7 +218,7 @@ export const NewProductionModal: React.FC<NewProductionModalProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-[13px] font-semibold text-[#2b1700] mb-1">
                 Coût de revient estimé (FCFA)
@@ -295,6 +296,7 @@ export const NewProductionModal: React.FC<NewProductionModalProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
