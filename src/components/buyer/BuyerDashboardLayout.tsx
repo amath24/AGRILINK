@@ -108,7 +108,7 @@ export const BuyerDashboardLayout: React.FC<BuyerDashboardLayoutProps> = ({
       {/* Main Container with Sidebar + Content */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
         {/* Sidebar (1 col) */}
-        <aside className="lg:col-span-1 bg-white border border-[#c1c9be] rounded-2xl p-4 lg:p-5 shadow-sm flex flex-col gap-4 lg:gap-6 lg:sticky lg:top-24">
+        <aside className="hidden lg:flex lg:col-span-1 bg-white border border-[#c1c9be] rounded-2xl p-4 lg:p-5 shadow-sm flex-col gap-4 lg:gap-6 lg:sticky lg:top-24">
           {/* User Profile Mini Badge */}
           <div className="flex items-center gap-3 pb-5 border-b border-[#c1c9be]/50">
             <div className="w-12 h-12 rounded-full bg-[#164525] text-white flex items-center justify-center font-['Montserrat'] font-bold text-[18px]">
