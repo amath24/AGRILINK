@@ -30,7 +30,20 @@ export const TraceabilityTab: React.FC<TraceabilityTabProps> = ({ lots }) => {
 
       {/* Grid of Traceability Lots */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {lots.map((lot) => (
+        {(lots || []).length === 0 ? (
+          <div className="col-span-full bg-white border border-[#c1c9be] rounded-2xl p-12 text-center flex flex-col items-center justify-center">
+            <div className="w-16 h-16 bg-[#FAF8F2] text-[#717970] rounded-full flex items-center justify-center mb-3">
+              <span className="material-symbols-outlined text-[32px]">qr_code_scanner</span>
+            </div>
+            <h3 className="font-['Montserrat'] text-[18px] font-bold text-[#2b1700] mb-1">
+              Aucun lot de traçabilité
+            </h3>
+            <p className="text-[13px] text-[#717970] max-w-sm">
+              Lors de la déclaration de vos récoltes et productions, vos lots certifiés et leurs QR codes seront générés automatiquement.
+            </p>
+          </div>
+        ) : (
+          lots.map((lot) => (
           <div
             key={lot.id}
             className="bg-white border border-[#c1c9be] rounded-2xl p-5 shadow-sm hover:border-[#164525] transition-all flex flex-col justify-between"
@@ -116,7 +129,8 @@ export const TraceabilityTab: React.FC<TraceabilityTabProps> = ({ lots }) => {
               </button>
             </div>
           </div>
-        ))}
+        ))
+        )}
       </div>
 
       {/* QR Code & Lot Detail Modal */}

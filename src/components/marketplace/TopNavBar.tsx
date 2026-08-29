@@ -344,6 +344,16 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
                       <button
                         onClick={() => {
                           setIsUserMenuOpen(false);
+                          onNavigate('register');
+                        }}
+                        className="w-full px-4 py-2 text-left text-[13px] text-[#164525] font-medium hover:bg-[#FAF8F2] flex items-center gap-2.5 cursor-pointer"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">person_add</span>
+                        Créer un nouveau compte
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
                           onNavigate('login');
                         }}
                         className="w-full px-4 py-2 text-left text-[13px] text-[#414941] hover:bg-[#FAF8F2] flex items-center gap-2.5 cursor-pointer"

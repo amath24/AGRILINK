@@ -33,6 +33,7 @@ import { ProducerNotificationsTab } from './tabs/ProducerNotificationsTab';
 
 import { NewPlotModal } from './tabs/NewPlotModal';
 import { NewProductionModal } from './tabs/NewProductionModal';
+import { UpdateProductionModal } from './tabs/UpdateProductionModal';
 import { NewPreorderModal } from './tabs/NewPreorderModal';
 import { StockMovementModal } from './tabs/StockMovementModal';
 import { OrderDetailModal } from './tabs/OrderDetailModal';
@@ -73,6 +74,7 @@ interface ProducerDashboardLayoutProps {
   onUpdatePlotStatus: (plotId: string, status: PlotStatus) => void;
   onAddProduction: (prod: CropProduction) => void;
   onUpdateProductionStatus: (prodId: string, status: ProductionStatus) => void;
+  onUpdateProduction?: (updatedProd: CropProduction) => void;
   onAddProductAsPreorder: (product: Product, productionId?: string) => void;
   onAddStockMovement: (mov: StockMovement, stockItemId: string) => void;
   onUpdateOrderStatus: (orderId: string, status: ProducerOrderStatus) => void;
@@ -107,6 +109,7 @@ export const ProducerDashboardLayout: React.FC<ProducerDashboardLayoutProps> = (
   onUpdatePlotStatus,
   onAddProduction,
   onUpdateProductionStatus,
+  onUpdateProduction,
   onAddProductAsPreorder,
   onAddStockMovement,
   onUpdateOrderStatus,
@@ -122,6 +125,8 @@ export const ProducerDashboardLayout: React.FC<ProducerDashboardLayoutProps> = (
   // Modals state
   const [isNewPlotModalOpen, setIsNewPlotModalOpen] = useState(false);
   const [isNewProductionModalOpen, setIsNewProductionModalOpen] = useState(false);
+  const [selectedProductionForUpdate, setSelectedProductionForUpdate] =
+    useState<CropProduction | null>(null);
   const [isNewPreorderModalOpen, setIsNewPreorderModalOpen] = useState(false);
   const [preselectedProductionForPreorder, setPreselectedProductionForPreorder] =
     useState<CropProduction | null>(null);
@@ -357,6 +362,7 @@ export const ProducerDashboardLayout: React.FC<ProducerDashboardLayoutProps> = (
             <ProductionsTab
               productions={productions}
               onOpenNewProduction={() => setIsNewProductionModalOpen(true)}
+              onOpenUpdateProduction={(prod) => setSelectedProductionForUpdate(prod)}
               onUpdateProductionStatus={onUpdateProductionStatus}
               onPublishPreorderFromProduction={handleOpenPreorderFromProd}
             />
@@ -447,6 +453,23 @@ export const ProducerDashboardLayout: React.FC<ProducerDashboardLayoutProps> = (
         onClose={() => setIsNewProductionModalOpen(false)}
         plots={plots}
         onAddProduction={onAddProduction}
+      />
+
+      <UpdateProductionModal
+        isOpen={!!selectedProductionForUpdate}
+        onClose={() => setSelectedProductionForUpdate(null)}
+        production={selectedProductionForUpdate}
+        plots={plots}
+        onUpdateProduction={(updated) => {
+          if (onUpdateProduction) {
+            onUpdateProduction(updated);
+          } else {
+            onUpdateProductionStatus(updated.id, updated.statut);
+          }
+        }}
+        onPublishPreorder={(prod) => {
+          handleOpenPreorderFromProd(prod);
+        }}
       />
 
       <NewPreorderModal

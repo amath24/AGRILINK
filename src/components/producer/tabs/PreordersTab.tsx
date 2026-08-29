@@ -136,7 +136,25 @@ export const PreordersTab: React.FC<PreordersTabProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-[#c1c9be]/40">
-              {preordersList.map((order) => (
+              {preordersList.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="py-12 text-center text-[#717970]">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <span className="material-symbols-outlined text-[36px] text-[#c1c9be]">receipt_long</span>
+                      <h3 className="font-['Montserrat'] text-[16px] font-bold text-[#2b1700]">Aucune précommande reçue</h3>
+                      <p className="text-[13px] text-[#717970] max-w-sm">Publiez des offres de précommandes sur vos récoltes à venir pour recevoir des réservations et acomptes.</p>
+                      <button
+                        onClick={onOpenNewPreorder}
+                        className="mt-2 bg-[#164525] text-white text-[12px] font-bold px-3.5 py-1.5 rounded-full hover:bg-[#2f5d3a] transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">add</span>
+                        Créer une offre de précommande
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                preordersList.map((order) => (
                 <tr key={order.id} className="hover:bg-[#FAF8F2]/60 transition-colors">
                   <td className="py-3.5 px-4">
                     <span className="font-mono font-bold text-[#164525]">
@@ -203,7 +221,8 @@ export const PreordersTab: React.FC<PreordersTabProps> = ({
                     </button>
                   </td>
                 </tr>
-              ))}
+              ))
+              )}
             </tbody>
           </table>
         </div>

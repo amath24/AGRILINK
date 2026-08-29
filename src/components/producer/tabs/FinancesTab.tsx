@@ -196,7 +196,18 @@ export const FinancesTab: React.FC<FinancesTabProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-[#c1c9be]/40">
-              {filteredTransactions.map((tx) => {
+              {filteredTransactions.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-12 text-center text-[#717970]">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <span className="material-symbols-outlined text-[36px] text-[#c1c9be]">account_balance_wallet</span>
+                      <h3 className="font-['Montserrat'] text-[16px] font-bold text-[#2b1700]">Aucune transaction enregistrée</h3>
+                      <p className="text-[13px] text-[#717970] max-w-sm">Les paiements d'acomptes et les déblocages de fonds apparaîtront automatiquement dans ce journal.</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                filteredTransactions.map((tx) => {
                 const isIncome = tx.type === 'Acompte' || tx.type === 'Solde' || tx.type === 'Paiement direct';
 
                 return (
@@ -234,7 +245,8 @@ export const FinancesTab: React.FC<FinancesTabProps> = ({
                     </td>
                   </tr>
                 );
-              })}
+              })
+              )}
             </tbody>
           </table>
         </div>

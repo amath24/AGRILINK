@@ -93,7 +93,18 @@ export const DeliveriesTab: React.FC<DeliveriesTabProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-[#c1c9be]/40">
-              {filteredDeliveries.map((del) => (
+              {filteredDeliveries.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-12 text-center text-[#717970]">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <span className="material-symbols-outlined text-[36px] text-[#c1c9be]">local_shipping</span>
+                      <h3 className="font-['Montserrat'] text-[16px] font-bold text-[#2b1700]">Aucune livraison trouvée</h3>
+                      <p className="text-[13px] text-[#717970] max-w-sm">Dès qu'une commande est prête à expédier, elle s'affichera ici avec le suivi transporteur.</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                filteredDeliveries.map((del) => (
                 <tr key={del.id} className="hover:bg-[#FAF8F2]/60 transition-colors">
                   <td className="py-3.5 px-4 font-mono font-bold text-[#164525]">
                     #{del.orderNumero}
@@ -172,7 +183,8 @@ export const DeliveriesTab: React.FC<DeliveriesTabProps> = ({
                     </div>
                   </td>
                 </tr>
-              ))}
+              ))
+              )}
             </tbody>
           </table>
         </div>

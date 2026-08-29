@@ -89,6 +89,16 @@ import { RegisterPage } from './components/auth/RegisterPage';
 import { useAuth } from './context/AuthContext';
 import { UserRoleType } from './types';
 
+const EMPTY_PRODUCER_FINANCE: ProducerFinanceSummary = {
+  revenusTotaux: 0,
+  acomptesRecus: 0,
+  soldesEnAttente: 0,
+  revenusSecurisesPourcentage: 0,
+  tauxVenteAvantRecolte: 0,
+  pertesPostRecoltePourcentage: 0,
+  panierMoyen: 0,
+};
+
 function safeGetStorage<T>(key: string, fallback: T): T {
   try {
     const saved = localStorage.getItem(key);
@@ -99,8 +109,18 @@ function safeGetStorage<T>(key: string, fallback: T): T {
   }
 }
 
+function getUserDataKey(uid: string | undefined, key: string): string {
+  if (!uid || uid === 'demo-producer-modou' || uid === 'demo-buyer-cheikh' || uid === 'demo-admin-fatou') {
+    return `agrilink_demo_${key}`;
+  }
+  return `agrilink_user_${uid}_${key}`;
+}
+
 export default function App() {
-  const { user, profile, role } = useAuth();
+  const { user, profile, role, producerProfile, buyerProfile: authBuyerProfile } = useAuth();
+
+  const isDemoProducer = profile?.uid === 'demo-producer-modou';
+  const isDemoBuyer = profile?.uid === 'demo-buyer-cheikh';
 
   // Navigation State
   const [currentView, setCurrentView] = useState<
@@ -130,7 +150,7 @@ export default function App() {
     safeGetStorage('agrilink_platform_settings', INITIAL_PLATFORM_SETTINGS)
   );
 
-  // Products State (Dynamically updated when producer publishes new offers)
+  // Products State (Marketplace catalog)
   const [products, setProducts] = useState<Product[]>(() =>
     safeGetStorage('agrilink_products', INITIAL_PRODUCTS)
   );
@@ -146,150 +166,392 @@ export default function App() {
   const [selectedReceiptData, setSelectedReceiptData] = useState<{ preorder?: Preorder; payment?: PaymentRecord } | null>(null);
   const [isNotificationsModalOpen, setIsNotificationsModalOpen] = useState<boolean>(false);
 
-  // Persistence / States - Buyer
-  const [preorders, setPreorders] = useState<Preorder[]>(() =>
-    safeGetStorage('agrilink_preorders', INITIAL_PREORDERS)
-  );
+  // Persistence / States - Buyer (Scoped per user)
+  const [preorders, setPreorders] = useState<Preorder[]>(() => {
+    const isDemo = !profile?.uid || profile.uid === 'demo-buyer-cheikh';
+    const key = getUserDataKey(profile?.uid, 'preorders');
+    return safeGetStorage(key, isDemo ? INITIAL_PREORDERS : []);
+  });
 
-  const [deliveries, setDeliveries] = useState<DeliveryRecord[]>(() =>
-    safeGetStorage('agrilink_deliveries', INITIAL_DELIVERIES)
-  );
+  const [deliveries, setDeliveries] = useState<DeliveryRecord[]>(() => {
+    const isDemo = !profile?.uid || profile.uid === 'demo-buyer-cheikh';
+    const key = getUserDataKey(profile?.uid, 'deliveries');
+    return safeGetStorage(key, isDemo ? INITIAL_DELIVERIES : []);
+  });
 
-  const [payments, setPayments] = useState<PaymentRecord[]>(() =>
-    safeGetStorage('agrilink_payments', INITIAL_PAYMENTS)
-  );
+  const [payments, setPayments] = useState<PaymentRecord[]>(() => {
+    const isDemo = !profile?.uid || profile.uid === 'demo-buyer-cheikh';
+    const key = getUserDataKey(profile?.uid, 'payments');
+    return safeGetStorage(key, isDemo ? INITIAL_PAYMENTS : []);
+  });
 
-  const [buyerProfile, setBuyerProfile] = useState<BuyerProfile>(() =>
-    safeGetStorage('agrilink_buyer_profile', INITIAL_BUYER_PROFILE)
-  );
+  const [buyerProfile, setBuyerProfile] = useState<BuyerProfile>(() => {
+    const isDemo = !profile?.uid || profile.uid === 'demo-buyer-cheikh';
+    const key = getUserDataKey(profile?.uid, 'buyer_profile');
+    return safeGetStorage(key, isDemo ? INITIAL_BUYER_PROFILE : {
+      id: profile?.uid || 'buyer-new',
+      nom: profile?.lastName || 'Utilisateur',
+      prenom: profile?.firstName || '',
+      email: profile?.email || '',
+      telephone: profile?.phone || '',
+      typeAcheteur: (authBuyerProfile?.buyerType === 'RESTAURANT' ? 'Restaurant / Traiteur' : authBuyerProfile?.buyerType === 'HOTEL' ? 'Hôtel' : authBuyerProfile?.buyerType === 'SUPERMARKET' ? 'Supermarché' : authBuyerProfile?.buyerType === 'PROFESSIONAL' ? 'Grossiste / Exportateur' : 'Particulier') as any,
+      nomEntreprise: authBuyerProfile?.companyName || `${profile?.firstName || ''} ${profile?.lastName || ''}`.trim(),
+      adresseLivraison: authBuyerProfile?.address || '',
+      ville: authBuyerProfile?.city || 'Dakar',
+      quartier: authBuyerProfile?.city || 'Dakar',
+      region: 'Dakar',
+      codeClient: `CL-${(profile?.uid || 'SN').slice(-6).toUpperCase()}`,
+      dateInscription: new Date().toLocaleDateString('fr-FR'),
+    });
+  });
 
-  const [notifications, setNotifications] = useState<BuyerNotification[]>(() =>
-    safeGetStorage('agrilink_notifications', INITIAL_NOTIFICATIONS)
-  );
+  const [notifications, setNotifications] = useState<BuyerNotification[]>(() => {
+    const isDemo = !profile?.uid || profile.uid === 'demo-buyer-cheikh';
+    const key = getUserDataKey(profile?.uid, 'notifications');
+    return safeGetStorage(key, isDemo ? INITIAL_NOTIFICATIONS : []);
+  });
 
-  const [favoriteProductIds, setFavoriteProductIds] = useState<string[]>(() =>
-    safeGetStorage('agrilink_favorites', ['tomates-cerises-sangalkam', 'mangues-kent-niayes'])
-  );
+  const [favoriteProductIds, setFavoriteProductIds] = useState<string[]>(() => {
+    const isDemo = !profile?.uid || profile.uid === 'demo-buyer-cheikh';
+    const key = getUserDataKey(profile?.uid, 'favorites');
+    return safeGetStorage(key, isDemo ? ['tomates-cerises-sangalkam', 'mangues-kent-niayes'] : []);
+  });
 
   const [selectedPreorderId, setSelectedPreorderId] = useState<string>('preorder-sample-1');
 
-  // Persistence / States - Producer ERP
-  const [farmProfile, setFarmProfile] = useState<FarmProfile>(() =>
-    safeGetStorage('agrilink_farm_profile', INITIAL_FARM_PROFILE)
-  );
+  // Persistence / States - Producer ERP (Scoped per user)
+  const [farmProfile, setFarmProfile] = useState<FarmProfile>(() => {
+    const isDemo = profile?.uid === 'demo-producer-modou';
+    const key = getUserDataKey(profile?.uid, 'farm_profile');
+    return safeGetStorage(key, isDemo ? INITIAL_FARM_PROFILE : {
+      id: profile?.uid || 'farm-new',
+      nomExploitation: producerProfile?.farmName || `Ferme ${profile?.firstName || ''}`,
+      gerant: `${profile?.firstName || ''} ${profile?.lastName || ''}`.trim() || 'Producteur',
+      description: producerProfile?.description || 'Nouvelle exploitation agricole partenaire Agri-Link.',
+      localisation: producerProfile?.location || 'Sénégal',
+      region: (producerProfile?.region as any) || 'Niayes',
+      superficie: 1.0,
+      uniteSuperficie: 'ha',
+      typeProduction: 'Raisonné / Agroécologique',
+      telephone: profile?.phone || '',
+      email: profile?.email || '',
+      anneeCreation: new Date().getFullYear(),
+      certifications: ['En cours de certification'],
+      informationsComplementaires: 'Nouvelle exploitation inscrite.',
+    });
+  });
 
-  const [plots, setPlots] = useState<Plot[]>(() =>
-    safeGetStorage('agrilink_plots', INITIAL_PLOTS)
-  );
+  const [plots, setPlots] = useState<Plot[]>(() => {
+    const isDemo = profile?.uid === 'demo-producer-modou';
+    const key = getUserDataKey(profile?.uid, 'plots');
+    return safeGetStorage(key, isDemo ? INITIAL_PLOTS : []);
+  });
 
-  const [productions, setProductions] = useState<CropProduction[]>(() =>
-    safeGetStorage('agrilink_productions', INITIAL_PRODUCTIONS)
-  );
+  const [productions, setProductions] = useState<CropProduction[]>(() => {
+    const isDemo = profile?.uid === 'demo-producer-modou';
+    const key = getUserDataKey(profile?.uid, 'productions');
+    return safeGetStorage(key, isDemo ? INITIAL_PRODUCTIONS : []);
+  });
 
-  const [stockItems, setStockItems] = useState<StockItem[]>(() =>
-    safeGetStorage('agrilink_stock_items', INITIAL_STOCK_ITEMS)
-  );
+  const [stockItems, setStockItems] = useState<StockItem[]>(() => {
+    const isDemo = profile?.uid === 'demo-producer-modou';
+    const key = getUserDataKey(profile?.uid, 'stock_items');
+    return safeGetStorage(key, isDemo ? INITIAL_STOCK_ITEMS : []);
+  });
 
-  const [stockMovements, setStockMovements] = useState<StockMovement[]>(() =>
-    safeGetStorage('agrilink_stock_movements', INITIAL_STOCK_MOVEMENTS)
-  );
+  const [stockMovements, setStockMovements] = useState<StockMovement[]>(() => {
+    const isDemo = profile?.uid === 'demo-producer-modou';
+    const key = getUserDataKey(profile?.uid, 'stock_movements');
+    return safeGetStorage(key, isDemo ? INITIAL_STOCK_MOVEMENTS : []);
+  });
 
-  const [producerOrders, setProducerOrders] = useState<ProducerOrder[]>(() =>
-    safeGetStorage('agrilink_producer_orders', INITIAL_PRODUCER_ORDERS)
-  );
+  const [producerOrders, setProducerOrders] = useState<ProducerOrder[]>(() => {
+    const isDemo = profile?.uid === 'demo-producer-modou';
+    const key = getUserDataKey(profile?.uid, 'producer_orders');
+    return safeGetStorage(key, isDemo ? INITIAL_PRODUCER_ORDERS : []);
+  });
 
-  const [producerDeliveries, setProducerDeliveries] = useState<ProducerDelivery[]>(() =>
-    safeGetStorage('agrilink_producer_deliveries', INITIAL_PRODUCER_DELIVERIES)
-  );
+  const [producerDeliveries, setProducerDeliveries] = useState<ProducerDelivery[]>(() => {
+    const isDemo = profile?.uid === 'demo-producer-modou';
+    const key = getUserDataKey(profile?.uid, 'producer_deliveries');
+    return safeGetStorage(key, isDemo ? INITIAL_PRODUCER_DELIVERIES : []);
+  });
 
-  const [traceabilityLots, setTraceabilityLots] = useState<TraceabilityLot[]>(() =>
-    safeGetStorage('agrilink_traceability_lots', INITIAL_TRACEABILITY_LOTS)
-  );
+  const [traceabilityLots, setTraceabilityLots] = useState<TraceabilityLot[]>(() => {
+    const isDemo = profile?.uid === 'demo-producer-modou';
+    const key = getUserDataKey(profile?.uid, 'traceability_lots');
+    return safeGetStorage(key, isDemo ? INITIAL_TRACEABILITY_LOTS : []);
+  });
 
-  const [financeSummary, setFinanceSummary] = useState<ProducerFinanceSummary>(() =>
-    safeGetStorage('agrilink_producer_finance', INITIAL_PRODUCER_FINANCE)
-  );
+  const [financeSummary, setFinanceSummary] = useState<ProducerFinanceSummary>(() => {
+    const isDemo = profile?.uid === 'demo-producer-modou';
+    const key = getUserDataKey(profile?.uid, 'producer_finance');
+    return safeGetStorage(key, isDemo ? INITIAL_PRODUCER_FINANCE : EMPTY_PRODUCER_FINANCE);
+  });
 
-  const [producerTransactions, setProducerTransactions] = useState<FinancialTransaction[]>(() =>
-    safeGetStorage('agrilink_producer_transactions', INITIAL_PRODUCER_TRANSACTIONS)
-  );
+  const [producerTransactions, setProducerTransactions] = useState<FinancialTransaction[]>(() => {
+    const isDemo = profile?.uid === 'demo-producer-modou';
+    const key = getUserDataKey(profile?.uid, 'producer_transactions');
+    return safeGetStorage(key, isDemo ? INITIAL_PRODUCER_TRANSACTIONS : []);
+  });
 
-  const [producerNotifications, setProducerNotifications] = useState<ProducerNotification[]>(() =>
-    safeGetStorage('agrilink_producer_notifications', INITIAL_PRODUCER_NOTIFICATIONS)
-  );
+  const [producerNotifications, setProducerNotifications] = useState<ProducerNotification[]>(() => {
+    const isDemo = profile?.uid === 'demo-producer-modou';
+    const key = getUserDataKey(profile?.uid, 'producer_notifications');
+    return safeGetStorage(key, isDemo ? INITIAL_PRODUCER_NOTIFICATIONS : []);
+  });
 
-  // LocalStorage Sync
+  // Dynamic user data switch when user logs in, registers, or changes account
+  useEffect(() => {
+    const uid = profile?.uid;
+    const isDemoProd = uid === 'demo-producer-modou';
+    const isDemoBuy = uid === 'demo-buyer-cheikh';
+
+    if (profile?.role === 'PRODUCER') {
+      const pKey = (k: string) => getUserDataKey(uid, k);
+      setPlots(safeGetStorage(pKey('plots'), isDemoProd ? INITIAL_PLOTS : []));
+      setProductions(safeGetStorage(pKey('productions'), isDemoProd ? INITIAL_PRODUCTIONS : []));
+      setStockItems(safeGetStorage(pKey('stock_items'), isDemoProd ? INITIAL_STOCK_ITEMS : []));
+      setStockMovements(safeGetStorage(pKey('stock_movements'), isDemoProd ? INITIAL_STOCK_MOVEMENTS : []));
+      setProducerOrders(safeGetStorage(pKey('producer_orders'), isDemoProd ? INITIAL_PRODUCER_ORDERS : []));
+      setProducerDeliveries(safeGetStorage(pKey('producer_deliveries'), isDemoProd ? INITIAL_PRODUCER_DELIVERIES : []));
+      setTraceabilityLots(safeGetStorage(pKey('traceability_lots'), isDemoProd ? INITIAL_TRACEABILITY_LOTS : []));
+      setFinanceSummary(safeGetStorage(pKey('producer_finance'), isDemoProd ? INITIAL_PRODUCER_FINANCE : EMPTY_PRODUCER_FINANCE));
+      setProducerTransactions(safeGetStorage(pKey('producer_transactions'), isDemoProd ? INITIAL_PRODUCER_TRANSACTIONS : []));
+      setProducerNotifications(safeGetStorage(pKey('producer_notifications'), isDemoProd ? INITIAL_PRODUCER_NOTIFICATIONS : []));
+
+      const defaultFarm: FarmProfile = isDemoProd ? INITIAL_FARM_PROFILE : {
+        id: uid || 'farm-new',
+        nomExploitation: producerProfile?.farmName || `Ferme de ${profile.firstName}`,
+        gerant: `${profile.firstName} ${profile.lastName}`.trim(),
+        description: producerProfile?.description || 'Nouvelle exploitation agricole partenaire Agri-Link.',
+        localisation: producerProfile?.location || 'Sénégal',
+        region: (producerProfile?.region as any) || 'Niayes',
+        superficie: 1.0,
+        uniteSuperficie: 'ha',
+        typeProduction: 'Raisonné / Agroécologique',
+        telephone: profile.phone || '',
+        email: profile.email,
+        anneeCreation: new Date().getFullYear(),
+        certifications: ['En cours de certification'],
+        informationsComplementaires: 'Exploitation nouvellement inscrite.',
+      };
+      setFarmProfile(safeGetStorage(pKey('farm_profile'), defaultFarm));
+    } else if (profile?.role === 'BUYER') {
+      const bKey = (k: string) => getUserDataKey(uid, k);
+      setPreorders(safeGetStorage(bKey('preorders'), isDemoBuy ? INITIAL_PREORDERS : []));
+      setDeliveries(safeGetStorage(bKey('deliveries'), isDemoBuy ? INITIAL_DELIVERIES : []));
+      setPayments(safeGetStorage(bKey('payments'), isDemoBuy ? INITIAL_PAYMENTS : []));
+      setNotifications(safeGetStorage(bKey('notifications'), isDemoBuy ? INITIAL_NOTIFICATIONS : []));
+      setFavoriteProductIds(safeGetStorage(bKey('favorites'), isDemoBuy ? ['tomates-cerises-sangalkam', 'mangues-kent-niayes'] : []));
+
+      const defaultBuyer: BuyerProfile = isDemoBuy ? INITIAL_BUYER_PROFILE : {
+        id: uid || 'buyer-new',
+        nom: profile.lastName,
+        prenom: profile.firstName,
+        email: profile.email,
+        telephone: profile.phone || '',
+        typeAcheteur: (authBuyerProfile?.buyerType === 'RESTAURANT' ? 'Restaurant / Traiteur' : authBuyerProfile?.buyerType === 'HOTEL' ? 'Hôtel' : authBuyerProfile?.buyerType === 'SUPERMARKET' ? 'Supermarché' : authBuyerProfile?.buyerType === 'PROFESSIONAL' ? 'Grossiste / Exportateur' : 'Particulier') as any,
+        nomEntreprise: authBuyerProfile?.companyName || `${profile.firstName} ${profile.lastName}`.trim(),
+        adresseLivraison: authBuyerProfile?.address || '',
+        ville: authBuyerProfile?.city || 'Dakar',
+        quartier: authBuyerProfile?.city || 'Dakar',
+        region: 'Dakar',
+        codeClient: `CL-${(uid || 'SN').slice(-6).toUpperCase()}`,
+        dateInscription: new Date().toLocaleDateString('fr-FR'),
+      };
+      setBuyerProfile(safeGetStorage(bKey('buyer_profile'), defaultBuyer));
+    }
+  }, [profile?.uid, profile?.role]);
+
+  // Save changes under user-specific storage keys
   useEffect(() => {
     localStorage.setItem('agrilink_products', JSON.stringify(products));
   }, [products]);
 
   useEffect(() => {
-    localStorage.setItem('agrilink_preorders', JSON.stringify(preorders));
-  }, [preorders]);
+    const key = getUserDataKey(profile?.uid, 'preorders');
+    localStorage.setItem(key, JSON.stringify(preorders));
+  }, [preorders, profile?.uid]);
 
   useEffect(() => {
-    localStorage.setItem('agrilink_deliveries', JSON.stringify(deliveries));
-  }, [deliveries]);
+    const key = getUserDataKey(profile?.uid, 'deliveries');
+    localStorage.setItem(key, JSON.stringify(deliveries));
+  }, [deliveries, profile?.uid]);
 
   useEffect(() => {
-    localStorage.setItem('agrilink_payments', JSON.stringify(payments));
-  }, [payments]);
+    const key = getUserDataKey(profile?.uid, 'payments');
+    localStorage.setItem(key, JSON.stringify(payments));
+  }, [payments, profile?.uid]);
 
   useEffect(() => {
-    localStorage.setItem('agrilink_buyer_profile', JSON.stringify(buyerProfile));
-  }, [buyerProfile]);
+    const key = getUserDataKey(profile?.uid, 'buyer_profile');
+    localStorage.setItem(key, JSON.stringify(buyerProfile));
+  }, [buyerProfile, profile?.uid]);
 
   useEffect(() => {
-    localStorage.setItem('agrilink_notifications', JSON.stringify(notifications));
-  }, [notifications]);
+    const key = getUserDataKey(profile?.uid, 'notifications');
+    localStorage.setItem(key, JSON.stringify(notifications));
+  }, [notifications, profile?.uid]);
 
   useEffect(() => {
-    localStorage.setItem('agrilink_favorites', JSON.stringify(favoriteProductIds));
-  }, [favoriteProductIds]);
+    const key = getUserDataKey(profile?.uid, 'favorites');
+    localStorage.setItem(key, JSON.stringify(favoriteProductIds));
+  }, [favoriteProductIds, profile?.uid]);
 
   useEffect(() => {
-    localStorage.setItem('agrilink_farm_profile', JSON.stringify(farmProfile));
-  }, [farmProfile]);
+    const key = getUserDataKey(profile?.uid, 'farm_profile');
+    localStorage.setItem(key, JSON.stringify(farmProfile));
+  }, [farmProfile, profile?.uid]);
 
   useEffect(() => {
-    localStorage.setItem('agrilink_plots', JSON.stringify(plots));
-  }, [plots]);
+    const key = getUserDataKey(profile?.uid, 'plots');
+    localStorage.setItem(key, JSON.stringify(plots));
+  }, [plots, profile?.uid]);
 
   useEffect(() => {
-    localStorage.setItem('agrilink_productions', JSON.stringify(productions));
-  }, [productions]);
+    const key = getUserDataKey(profile?.uid, 'productions');
+    localStorage.setItem(key, JSON.stringify(productions));
+  }, [productions, profile?.uid]);
 
   useEffect(() => {
-    localStorage.setItem('agrilink_stock_items', JSON.stringify(stockItems));
-  }, [stockItems]);
+    const key = getUserDataKey(profile?.uid, 'stock_items');
+    localStorage.setItem(key, JSON.stringify(stockItems));
+  }, [stockItems, profile?.uid]);
 
   useEffect(() => {
-    localStorage.setItem('agrilink_stock_movements', JSON.stringify(stockMovements));
-  }, [stockMovements]);
+    const key = getUserDataKey(profile?.uid, 'stock_movements');
+    localStorage.setItem(key, JSON.stringify(stockMovements));
+  }, [stockMovements, profile?.uid]);
 
   useEffect(() => {
-    localStorage.setItem('agrilink_producer_orders', JSON.stringify(producerOrders));
-  }, [producerOrders]);
+    const key = getUserDataKey(profile?.uid, 'producer_orders');
+    localStorage.setItem(key, JSON.stringify(producerOrders));
+  }, [producerOrders, profile?.uid]);
 
   useEffect(() => {
-    localStorage.setItem('agrilink_producer_deliveries', JSON.stringify(producerDeliveries));
-  }, [producerDeliveries]);
+    const key = getUserDataKey(profile?.uid, 'producer_deliveries');
+    localStorage.setItem(key, JSON.stringify(producerDeliveries));
+  }, [producerDeliveries, profile?.uid]);
 
   useEffect(() => {
-    localStorage.setItem('agrilink_traceability_lots', JSON.stringify(traceabilityLots));
-  }, [traceabilityLots]);
+    const key = getUserDataKey(profile?.uid, 'traceability_lots');
+    localStorage.setItem(key, JSON.stringify(traceabilityLots));
+  }, [traceabilityLots, profile?.uid]);
 
   useEffect(() => {
-    localStorage.setItem('agrilink_producer_finance', JSON.stringify(financeSummary));
-  }, [financeSummary]);
+    const key = getUserDataKey(profile?.uid, 'producer_finance');
+    localStorage.setItem(key, JSON.stringify(financeSummary));
+  }, [financeSummary, profile?.uid]);
 
   useEffect(() => {
-    localStorage.setItem('agrilink_producer_transactions', JSON.stringify(producerTransactions));
-  }, [producerTransactions]);
+    const key = getUserDataKey(profile?.uid, 'producer_transactions');
+    localStorage.setItem(key, JSON.stringify(producerTransactions));
+  }, [producerTransactions, profile?.uid]);
 
   useEffect(() => {
-    localStorage.setItem('agrilink_producer_notifications', JSON.stringify(producerNotifications));
-  }, [producerNotifications]);
+    const key = getUserDataKey(profile?.uid, 'producer_notifications');
+    localStorage.setItem(key, JSON.stringify(producerNotifications));
+  }, [producerNotifications, profile?.uid]);
+
+  // Synchronize authenticated profile with local application state when user registers or changes
+  useEffect(() => {
+    if (!profile) return;
+
+    const fullName = `${profile.firstName} ${profile.lastName}`.trim() || 'Utilisateur';
+
+    // 1. Sync Farm Profile if Producer
+    if (profile.role === 'PRODUCER') {
+      setFarmProfile((prev) => ({
+        ...prev,
+        nomExploitation: producerProfile?.farmName || prev.nomExploitation || 'Ferme Agro-Écologique',
+        nomProducteur: fullName,
+        email: profile.email,
+        telephone: profile.phone || prev.telephone,
+        localisation: producerProfile?.location || prev.localisation || 'Sangalkam, Niayes',
+      }));
+
+      // Also ensure producer is in adminProducers list
+      setAdminProducers((prev) => {
+        const exists = prev.some((p) => p.email.toLowerCase() === profile.email.toLowerCase() || p.id === profile.uid);
+        if (exists) return prev;
+        const newProducer: AdminProducer = {
+          id: profile.uid || `prod-${Date.now()}`,
+          nom: producerProfile?.farmName || `Ferme de ${profile.firstName}`,
+          exploitation: producerProfile?.farmName || `Ferme de ${profile.firstName}`,
+          gerant: fullName,
+          localisation: producerProfile?.location || 'Sangalkam, Rufisque',
+          region: producerProfile?.region || 'Dakar / Niayes',
+          telephone: profile.phone,
+          email: profile.email,
+          nombreProduits: 0,
+          nombreCommandes: 0,
+          statutValidation: 'En attente de validation',
+          dateInscription: new Date().toISOString().split('T')[0],
+          superficie: 3.5,
+          certifications: ['Origine Locale Contrôlée'],
+          typeProduction: producerProfile?.description || 'Maraîchage diversifié',
+        };
+        return [newProducer, ...prev];
+      });
+    }
+
+    // 2. Sync Buyer Profile if Buyer
+    if (profile.role === 'BUYER') {
+      setBuyerProfile((prev) => ({
+        ...prev,
+        nom: fullName,
+        email: profile.email,
+        telephone: profile.phone || prev.telephone,
+        adresse: authBuyerProfile?.address || prev.adresse,
+        ville: authBuyerProfile?.city || prev.ville,
+        categorie: (authBuyerProfile?.buyerType === 'RESTAURANT' ? 'Restaurant' : authBuyerProfile?.buyerType === 'HOTEL' ? 'Hôtel' : authBuyerProfile?.buyerType === 'SUPERMARKET' ? 'Supermarché' : authBuyerProfile?.buyerType === 'PROFESSIONAL' ? 'Grossiste' : 'Particulier') as any,
+        nomEtablissement: authBuyerProfile?.companyName || prev.nomEtablissement,
+      }));
+
+      // Also ensure buyer is in adminBuyers list
+      setAdminBuyers((prev) => {
+        const exists = prev.some((b) => b.email.toLowerCase() === profile.email.toLowerCase() || b.id === profile.uid);
+        if (exists) return prev;
+        const newBuyer: AdminBuyer = {
+          id: profile.uid || `buy-${Date.now()}`,
+          nom: profile.lastName,
+          prenom: profile.firstName,
+          typeAcheteur: authBuyerProfile?.buyerType === 'RESTAURANT' ? 'Restaurant' : authBuyerProfile?.buyerType === 'HOTEL' ? 'Hôtel' : authBuyerProfile?.buyerType === 'SUPERMARKET' ? 'Supermarché' : authBuyerProfile?.buyerType === 'PROFESSIONAL' ? 'Professionnel' : 'Particulier',
+          email: profile.email,
+          telephone: profile.phone,
+          nombreCommandes: 0,
+          montantDepense: 0,
+          statut: 'Actif',
+          dateInscription: new Date().toISOString().split('T')[0],
+          adresse: authBuyerProfile?.address || 'Dakar',
+          ville: authBuyerProfile?.city || 'Dakar',
+        };
+        return [newBuyer, ...prev];
+      });
+    }
+
+    // 3. Ensure user is in adminUsers list
+    setAdminUsers((prev) => {
+      const exists = prev.some((u) => u.email.toLowerCase() === profile.email.toLowerCase() || u.id === profile.uid);
+      if (exists) return prev;
+      const newUser: AdminUser = {
+        id: profile.uid || `usr-${Date.now()}`,
+        nom: profile.lastName,
+        prenom: profile.firstName,
+        email: profile.email,
+        telephone: profile.phone,
+        role: profile.role === 'ADMIN' ? 'Administrateur' : profile.role === 'PRODUCER' ? 'Producteur' : 'Acheteur',
+        dateInscription: new Date().toISOString().split('T')[0],
+        statut: 'Actif',
+        organisation: profile.role === 'PRODUCER' ? producerProfile?.farmName : authBuyerProfile?.companyName,
+        localisation: producerProfile?.location || authBuyerProfile?.city || 'Sénégal',
+        commandesCount: 0,
+        totalDepenseOuVendu: 0,
+      };
+      return [newUser, ...prev];
+    });
+  }, [profile, producerProfile, authBuyerProfile]);
 
   // Favorite Products list
   const favoriteProducts = useMemo(() => {
@@ -353,6 +615,19 @@ export default function App() {
       return true;
     });
   }, [filters, products]);
+
+  // Producer filtered products for ERP
+  const producerVisibleProducts = useMemo(() => {
+    if (isDemoProducer) {
+      return products;
+    }
+    return products.filter(
+      (p) =>
+        p.producteur === farmProfile.nomExploitation ||
+        p.producteur === farmProfile.gerant ||
+        (profile?.uid && (p as any).producteurId === profile.uid)
+    );
+  }, [products, isDemoProducer, farmProfile, profile?.uid]);
 
   // Navigation Handlers
   const handleSelectProduct = (product: Product) => {
@@ -627,6 +902,21 @@ export default function App() {
     setProductions((prev) =>
       prev.map((p) => (p.id === prodId ? { ...p, statut: status } : p))
     );
+  };
+
+  const handleUpdateProduction = (updatedProd: CropProduction) => {
+    setProductions((prev) =>
+      prev.map((p) => (p.id === updatedProd.id ? updatedProd : p))
+    );
+    const notif: ProducerNotification = {
+      id: `notif-prod-up-${Date.now()}`,
+      titre: 'Cycle de Production Mis à Jour',
+      message: `Mise à jour effectuée pour ${updatedProd.produitNom} (Statut: ${updatedProd.statut}, Récolté: ${updatedProd.quantiteRecoltee} ${updatedProd.unite}).`,
+      date: "À l'instant",
+      type: 'harvest',
+      read: false,
+    };
+    setProducerNotifications((prev) => [notif, ...prev]);
   };
 
   const handleAddProductAsPreorder = (
@@ -1149,12 +1439,13 @@ export default function App() {
             financeSummary={financeSummary}
             transactions={producerTransactions}
             notifications={producerNotifications}
-            products={products}
+            products={producerVisibleProducts}
             onUpdateFarmProfile={handleUpdateFarmProfile}
             onAddPlot={handleAddPlot}
             onUpdatePlotStatus={handleUpdatePlotStatus}
             onAddProduction={handleAddProduction}
             onUpdateProductionStatus={handleUpdateProductionStatus}
+            onUpdateProduction={handleUpdateProduction}
             onAddProductAsPreorder={handleAddProductAsPreorder}
             onAddStockMovement={handleAddStockMovement}
             onUpdateOrderStatus={handleUpdateProducerOrderStatus}

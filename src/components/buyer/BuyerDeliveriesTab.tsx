@@ -107,7 +107,20 @@ export const BuyerDeliveriesTab: React.FC<BuyerDeliveriesTabProps> = ({
 
       {/* Deliveries List */}
       <div className="grid grid-cols-1 gap-6">
-        {filteredDeliveries.map((delivery) => {
+        {filteredDeliveries.length === 0 ? (
+          <div className="bg-white border border-[#c1c9be] rounded-2xl p-12 text-center flex flex-col items-center justify-center">
+            <div className="w-16 h-16 bg-[#FAF8F2] text-[#717970] rounded-full flex items-center justify-center mb-3">
+              <span className="material-symbols-outlined text-[32px]">local_shipping</span>
+            </div>
+            <h3 className="font-['Montserrat'] text-[18px] font-bold text-[#2b1700] mb-1">
+              Aucune livraison en cours
+            </h3>
+            <p className="text-[13px] text-[#717970] max-w-sm">
+              Dès qu'une de vos commandes ou précommandes sera expédiée par le producteur, les coordonnées du chauffeur et le suivi apparaîtront ici.
+            </p>
+          </div>
+        ) : (
+          filteredDeliveries.map((delivery) => {
           const badge = getStatusBadge(delivery.statut);
 
           return (
@@ -222,7 +235,8 @@ export const BuyerDeliveriesTab: React.FC<BuyerDeliveriesTabProps> = ({
               </div>
             </div>
           );
-        })}
+        })
+        )}
       </div>
     </div>
   );

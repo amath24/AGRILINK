@@ -153,7 +153,18 @@ export const StocksTab: React.FC<StocksTabProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#c1c9be]/40">
-                {safeStockItems.map((item) => {
+                {safeStockItems.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="py-12 text-center text-[#717970]">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <span className="material-symbols-outlined text-[36px] text-[#c1c9be]">warehouse</span>
+                        <h3 className="font-['Montserrat'] text-[16px] font-bold text-[#2b1700]">Aucun article en stock</h3>
+                        <p className="text-[13px] text-[#717970] max-w-sm">Vos stocks se mettront à jour automatiquement après déclaration de vos récoltes ou enregistrement d'entrées.</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  safeStockItems.map((item) => {
                   const dispo = Math.max(0, (item.stockTotal || 0) - (item.stockReserve || 0));
                   const isLow = dispo <= (item.seuilAlerte || 0);
 
@@ -198,7 +209,8 @@ export const StocksTab: React.FC<StocksTabProps> = ({
                       </td>
                     </tr>
                   );
-                })}
+                })
+                )}
               </tbody>
             </table>
           </div>
@@ -218,7 +230,18 @@ export const StocksTab: React.FC<StocksTabProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#c1c9be]/40">
-                {safeMovements.map((mov) => {
+                {safeMovements.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-12 text-center text-[#717970]">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <span className="material-symbols-outlined text-[36px] text-[#c1c9be]">swap_vert</span>
+                        <h3 className="font-['Montserrat'] text-[16px] font-bold text-[#2b1700]">Aucun mouvement enregistré</h3>
+                        <p className="text-[13px] text-[#717970] max-w-sm">Effectuez un mouvement d'entrée ou de sortie pour tracer les flux de stocks.</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  safeMovements.map((mov) => {
                   const isEntry = mov.type === 'Entrée';
                   const isExit = mov.type === 'Sortie';
 
@@ -256,7 +279,8 @@ export const StocksTab: React.FC<StocksTabProps> = ({
                       </td>
                     </tr>
                   );
-                })}
+                })
+                )}
               </tbody>
             </table>
           </div>

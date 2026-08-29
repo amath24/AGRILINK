@@ -4,6 +4,7 @@ import { CropProduction, ProductionStatus } from '../../../types';
 interface ProductionsTabProps {
   productions: CropProduction[];
   onOpenNewProduction: () => void;
+  onOpenUpdateProduction?: (prod: CropProduction) => void;
   onUpdateProductionStatus: (prodId: string, status: ProductionStatus) => void;
   onPublishPreorderFromProduction: (prod: CropProduction) => void;
 }
@@ -11,6 +12,7 @@ interface ProductionsTabProps {
 export const ProductionsTab: React.FC<ProductionsTabProps> = ({
   productions,
   onOpenNewProduction,
+  onOpenUpdateProduction,
   onUpdateProductionStatus,
   onPublishPreorderFromProduction,
 }) => {
@@ -129,7 +131,25 @@ export const ProductionsTab: React.FC<ProductionsTabProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-[#c1c9be]/40">
-              {filteredProductions.map((prod) => {
+              {filteredProductions.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-12 text-center text-[#717970]">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <span className="material-symbols-outlined text-[36px] text-[#c1c9be]">potted_plant</span>
+                      <h3 className="font-['Montserrat'] text-[16px] font-bold text-[#2b1700]">Aucune production en cours</h3>
+                      <p className="text-[13px] text-[#717970] max-w-sm">Lancez une nouvelle campagne de production liée à vos parcelles pour proposer vos récoltes aux acheteurs.</p>
+                      <button
+                        onClick={onOpenNewProduction}
+                        className="mt-2 bg-[#164525] text-white text-[12px] font-semibold px-4 py-2 rounded-full hover:bg-[#2f5d3a] transition-all flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">add_circle</span>
+                        Planifier une production
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                filteredProductions.map((prod) => {
                 const reservationRate = Math.min(
                   100,
                   Math.round((prod.quantiteReservee / prod.quantitePrevue) * 100)
@@ -225,6 +245,19 @@ export const ProductionsTab: React.FC<ProductionsTabProps> = ({
                           </span>
                         )}
 
+                        {onOpenUpdateProduction && (
+                          <button
+                            type="button"
+                            onClick={() => onOpenUpdateProduction(prod)}
+                            className="p-1.5 rounded-lg border border-[#c1c9be] text-[#2b1700] hover:bg-[#FAF8F2] hover:border-[#164525] transition-colors cursor-pointer"
+                            title="Modifier / Enregistrer la récolte"
+                          >
+                            <span className="material-symbols-outlined text-[16px]">
+                              edit
+                            </span>
+                          </button>
+                        )}
+
                         <select
                           value={prod.statut}
                           onChange={(e) =>
@@ -245,7 +278,8 @@ export const ProductionsTab: React.FC<ProductionsTabProps> = ({
                     </td>
                   </tr>
                 );
-              })}
+              })
+              )}
             </tbody>
           </table>
         </div>

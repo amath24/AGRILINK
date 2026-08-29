@@ -147,7 +147,27 @@ export const PlotsTab: React.FC<PlotsTabProps> = ({
       {/* Plots Display: Cards or Table */}
       {viewMode === 'cards' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPlots.map((plot) => (
+          {filteredPlots.length === 0 ? (
+            <div className="col-span-full bg-white border border-[#c1c9be] rounded-2xl p-12 text-center flex flex-col items-center justify-center">
+              <div className="w-16 h-16 bg-[#FAF8F2] text-[#717970] rounded-full flex items-center justify-center mb-3">
+                <span className="material-symbols-outlined text-[32px]">grid_view</span>
+              </div>
+              <h3 className="font-['Montserrat'] text-[18px] font-bold text-[#2b1700] mb-1">
+                Aucune parcelle enregistrée
+              </h3>
+              <p className="text-[13px] text-[#717970] max-w-sm mb-4">
+                Ajoutez vos parcelles et zones de culture pour planifier vos récoltes et assurer la traçabilité de vos produits.
+              </p>
+              <button
+                onClick={onOpenNewPlot}
+                className="bg-[#164525] text-white text-[13px] font-semibold px-5 py-2.5 rounded-full hover:bg-[#2f5d3a] transition-all flex items-center gap-2 cursor-pointer shadow-xs"
+              >
+                <span className="material-symbols-outlined text-[18px]">add_circle</span>
+                Ajouter ma première parcelle
+              </button>
+            </div>
+          ) : (
+            filteredPlots.map((plot) => (
             <div
               key={plot.id}
               className="bg-white border border-[#c1c9be] rounded-2xl p-5 shadow-sm hover:border-[#164525] transition-all flex flex-col justify-between"
@@ -237,7 +257,8 @@ export const PlotsTab: React.FC<PlotsTabProps> = ({
                 </select>
               </div>
             </div>
-          ))}
+          ))
+          )}
         </div>
       ) : (
         /* Table View */
@@ -257,7 +278,17 @@ export const PlotsTab: React.FC<PlotsTabProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#c1c9be]/40">
-                {filteredPlots.map((plot) => (
+                {filteredPlots.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="py-12 text-center text-[#717970]">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <span className="material-symbols-outlined text-[32px] text-[#c1c9be]">grid_view</span>
+                        <p className="font-medium text-[14px]">Aucune parcelle trouvée.</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredPlots.map((plot) => (
                   <tr key={plot.id} className="hover:bg-[#FAF8F2]/60 transition-colors">
                     <td className="py-3.5 px-4 font-semibold text-[#2b1700]">
                       {plot.nom}
@@ -307,7 +338,8 @@ export const PlotsTab: React.FC<PlotsTabProps> = ({
                       </select>
                     </td>
                   </tr>
-                ))}
+                ))
+                )}
               </tbody>
             </table>
           </div>

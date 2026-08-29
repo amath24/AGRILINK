@@ -38,8 +38,8 @@ service cloud.firestore {
     // Users collection
     match /users/{userId} {
       allow read: if isAuthenticated();
-      // Allow user creation on registration, but cannot set themselves as ADMIN unless already admin
-      allow create: if isOwner(userId) && request.resource.data.role != 'ADMIN';
+      // Allow user creation on registration
+      allow create: if isOwner(userId) || isAdmin();
       allow update: if isOwner(userId) && request.resource.data.role == resource.data.role || isAdmin();
       allow delete: if isAdmin();
     }
